@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.KeyanchengguoCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.keyanchengguo_id as keyanchengguoId
+        ,a.xuesheng_id as xueshengId
+        ,a.keyanchengguo_collection_types as keyanchengguoCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.KeyanchengguoCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,keyanchengguo.jiaoshi_id as keyanchengguoJiaoshiId
+        ,keyanchengguo.keyanchengguo_name as keyanchengguoName
+        ,keyanchengguo.keyanchengguo_uuid_number as keyanchengguoUuidNumber
+        ,keyanchengguo.keyanchengguo_file as keyanchengguoFile
+        ,keyanchengguo.keyanchengguo_photo as keyanchengguoPhoto
+        ,keyanchengguo.keyanchengguo_types as keyanchengguoTypes
+        ,keyanchengguo.keyanchengguo_clicknum as keyanchengguoClicknum
+        ,keyanchengguo.keyanchengguo_content as keyanchengguoContent
+        ,keyanchengguo.shangxia_types as shangxiaTypes
+        ,keyanchengguo.keyanchengguo_delete as keyanchengguoDelete
+        ,xuesheng.xuesheng_uuid_number as xueshengUuidNumber
+        ,xuesheng.xuesheng_name as xueshengName
+        ,xuesheng.xuesheng_phone as xueshengPhone
+        ,xuesheng.xuesheng_id_number as xueshengIdNumber
+        ,xuesheng.xuesheng_photo as xueshengPhoto
+        ,xuesheng.xuesheng_email as xueshengEmail
+
+        FROM keyanchengguo_collection  a
+        left JOIN keyanchengguo keyanchengguo ON a.keyanchengguo_id = keyanchengguo.id
+        left JOIN xuesheng xuesheng ON a.xuesheng_id = xuesheng.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.keyanchengguoId != null and params.keyanchengguoId != ''">
+                and (
+                    a.keyanchengguo_id = #{params.keyanchengguoId}
+                )
+            </if>
+            <if test="params.xueshengId != null and params.xueshengId != ''">
+                and (
+                    a.xuesheng_id = #{params.xueshengId}
+                )
+            </if>
+            <if test="params.keyanchengguoCollectionTypes != null and params.keyanchengguoCollectionTypes != ''">
+                and a.keyanchengguo_collection_types = #{params.keyanchengguoCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断科研成果的id不为空 -->
+            <if test=" params.keyanchengguoIdNotNull != '' and params.keyanchengguoIdNotNull != null and params.keyanchengguoIdNotNull != 'null' ">
+                and a.keyanchengguo_id IS NOT NULL
+            </if>
+            <if test="params.jiaoshiId != null  and params.jiaoshiId != ''">
+                and keyanchengguo.jiaoshi_id = #{params.jiaoshiId}
+            </if>
+            <if test=" params.keyanchengguoName != '' and params.keyanchengguoName != null and params.keyanchengguoName != 'null' ">
+                and keyanchengguo.keyanchengguo_name like CONCAT('%',#{params.keyanchengguoName},'%')
+            </if>
+            <if test=" params.keyanchengguoUuidNumber != '' and params.keyanchengguoUuidNumber != null and params.keyanchengguoUuidNumber != 'null' ">
+                and keyanchengguo.keyanchengguo_uuid_number like CONCAT('%',#{params.keyanchengguoUuidNumber},'%')
+            </if>
+            <if test="params.keyanchengguoTypes != null  and params.keyanchengguoTypes != ''">
+                and keyanchengguo.keyanchengguo_types = #{params.keyanchengguoTypes}
+            </if>
+
+            <if test="params.keyanchengguoClicknumStart != null  and params.keyanchengguoClicknumStart != '' ">
+                <![CDATA[  and keyanchengguo.keyanchengguo_clicknum >= #{params.keyanchengguoClicknumStart}   ]]>
+            </if>
+            <if test="params.keyanchengguoClicknumEnd != null  and params.keyanchengguoClicknumEnd != '' ">
+                <![CDATA[  and keyanchengguo.keyanchengguo_clicknum <= #{params.keyanchengguoClicknumEnd}   ]]>
+            </if>
+            <if test="params.keyanchengguoClicknum != null  and params.keyanchengguoClicknum != '' ">
+                and keyanchengguo.keyanchengguo_clicknum = #{params.keyanchengguoClicknum}
+            </if>
+            <if test=" params.keyanchengguoContent != '' and params.keyanchengguoContent != null and params.keyanchengguoContent != 'null' ">
+                and keyanchengguo.keyanchengguo_content like CONCAT('%',#{params.keyanchengguoContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and keyanchengguo.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.keyanchengguoDeleteStart != null  and params.keyanchengguoDeleteStart != '' ">
+                <![CDATA[  and keyanchengguo.keyanchengguo_delete >= #{params.keyanchengguoDeleteStart}   ]]>
+            </if>
+            <if test="params.keyanchengguoDeleteEnd != null  and params.keyanchengguoDeleteEnd != '' ">
+                <![CDATA[  and keyanchengguo.keyanchengguo_delete <= #{params.keyanchengguoDeleteEnd}   ]]>
+            </if>
+            <if test="params.keyanchengguoDelete != null  and params.keyanchengguoDelete != '' ">
+                and keyanchengguo.keyanchengguo_delete = #{params.keyanchengguoDelete}
+            </if>
+                <!-- 判断学生的id不为空 -->
+            <if test=" params.xueshengIdNotNull != '' and params.xueshengIdNotNull != null and params.xueshengIdNotNull != 'null' ">
+                and a.xuesheng_id IS NOT NULL
+            </if>
+            <if test=" params.xueshengUuidNumber != '' and params.xueshengUuidNumber != null and params.xueshengUuidNumber != 'null' ">
+                and xuesheng.xuesheng_uuid_number like CONCAT('%',#{params.xueshengUuidNumber},'%')
+            </if>
+            <if test=" params.xueshengName != '' and params.xueshengName != null and params.xueshengName != 'null' ">
+                and xuesheng.xuesheng_name like CONCAT('%',#{params.xueshengName},'%')
+            </if>
+            <if test=" params.xueshengPhone != '' and params.xueshengPhone != null and params.xueshengPhone != 'null' ">
+                and xuesheng.xuesheng_phone like CONCAT('%',#{params.xueshengPhone},'%')
+            </if>
+            <if test=" params.xueshengIdNumber != '' and params.xueshengIdNumber != null and params.xueshengIdNumber != 'null' ">
+                and xuesheng.xuesheng_id_number like CONCAT('%',#{params.xueshengIdNumber},'%')
+            </if>
+            <if test=" params.xueshengEmail != '' and params.xueshengEmail != null and params.xueshengEmail != 'null' ">
+                and xuesheng.xuesheng_email like CONCAT('%',#{params.xueshengEmail},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
